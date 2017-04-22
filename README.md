@@ -1,5 +1,5 @@
-fd-smt
-======
+clpfd-smt
+=========
 
 This package contains libraries for finite domain constraint programming,
 where an SMT solver is used to solve finite domain constraints.
