@@ -1,0 +1,17 @@
+{
+    "name": "clpfd-smt",
+    "version": "0.0.1",
+    "author": "Sven Hueser",
+    "maintainer": "Michael Hanus <mh@informatik.uni-kiel.de",
+    "synopsis": "Libraries for finite-domain constraints implemented with SMT/SAT",
+    "category": [ "Programming", "Constraints" ],
+    "dependencies": {
+    },
+    "exportedModules": [  ],
+    "license": "BSD-3-Clause",
+    "licenseFile": "LICENSE",
+    "source": {
+        "git": "https://git.ps.informatik.uni-kiel.de/curry-packages/clpfd-smt.git",
+        "tag": "$version"
+    }
+}
