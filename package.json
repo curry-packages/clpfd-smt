@@ -7,6 +7,10 @@
     "category": [ "Constraints" ],
     "dependencies": {
     },
+    "compilerCompatibility": {
+        "pakcs": ">= 1.14.0, < 2.0.0",
+        "kics2": ">= 0.5.0, < 2.0.0"
+    },
     "exportedModules": [  ],
     "license": "BSD-3-Clause",
     "licenseFile": "LICENSE",
