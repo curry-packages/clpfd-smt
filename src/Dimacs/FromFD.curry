@@ -1,11 +1,11 @@
-module XFD.Dimacs.FromFD where
+module Dimacs.FromFD where
 
 import Integer as I
 
 import XFD.FD
 import XFD.State
-import XFD.Dimacs.Types
-import XFD.Dimacs.Build
+import Dimacs.Types
+import Dimacs.Build
 
 
 ilog2 :: Int -> Int

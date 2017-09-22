@@ -7,14 +7,15 @@ module XFD.Dimacs (
 import IO
 import IOExts
 
+import Dimacs.Types
+import Dimacs.Build
+import Dimacs.Pretty
+import Dimacs.Parser
+
+import Dimacs.FromFD
 import XFD.FD
 import XFD.State
 import XFD.Solver
-import XFD.Dimacs.Types
-import XFD.Dimacs.Build
-import XFD.Dimacs.Pretty
-import XFD.Dimacs.Parser
-import XFD.Dimacs.FromFD
 
 
 solveDimacs :: SolverImpl--SolverConfig -> SolverOptions -> [FDExpr] -> FDConstr -> IO [[Int]]
