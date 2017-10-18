@@ -6,7 +6,8 @@
     "synopsis": "Libraries for finite-domain constraints implemented with SMT/SAT",
     "category": [ "Constraints" ],
     "dependencies": {
-        "dimacs": ">= 0.0.1"
+        "dimacs"   : ">= 0.0.1",
+        "fl-parser": ">= 1.0.0"
     },
     "compilerCompatibility": {
         "pakcs": ">= 1.14.0, < 2.0.0",
