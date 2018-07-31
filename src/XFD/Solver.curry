@@ -3,7 +3,7 @@
 
 module XFD.Solver where
 
-import Unsafe
+import System.IO.Unsafe
 
 import XFD.FD (FDConstr, FDExpr (FDVar))
 import qualified XFD.SMTLib.Types as SMT (Option(..))

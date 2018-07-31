@@ -2,7 +2,7 @@ module MQueens where
 
 import XFD.Solvers.SMT.Z3
 
-import List (transpose,elemIndex)
+import Data.List (transpose,elemIndex)
 
 queens :: Int -> (Int, [Int])
 queens n =

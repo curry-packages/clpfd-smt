@@ -6,7 +6,7 @@ module XFD.SMTLib.Pretty (
   ) where
 
 import XFD.SMTLib.Types
-import Pretty
+import Text.Pretty
 
 
 --- Shows a pretty printed version of a list of SMT-LIB commands.

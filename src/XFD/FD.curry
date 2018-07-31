@@ -14,7 +14,7 @@
 ---       let fdvars  = take n (domain u o)
 ---           fdmodel = {description of FD problem}
 ---        in solveFD {options} fdvars fdmodel
---- 
+---
 --- where `n` are the number of variables and `[u..o]` is the
 --- range of their possible values.
 ---
@@ -28,8 +28,7 @@
 
 module XFD.FD where
 
-import List (nubBy)
-import qualified Integer as I (abs)
+import Data.List (nubBy)
 
 infixl 7 *#
 infixl 6 +#, -#
@@ -178,8 +177,10 @@ data FDExpr = FDVar String Int Int Int
             | FDInt Int
             | FDBinExp FDOp FDExpr FDExpr
             | FDAbs     FDExpr
+  deriving (Show)
 
 data FDOp = Plus | Minus | Times
+  deriving (Show)
 
 --- Possible relations between FD values.
 --- @cons Equ - Equal
@@ -189,6 +190,7 @@ data FDOp = Plus | Minus | Times
 --- @cons Gt  - Greater than
 --- @cons Geq - Greater than or equal
 data FDRel = Equ | Neq | Lt | Leq | Gt | Geq
+  deriving (Show)
 
 -- Abstract type for FD constraints:
 data FDConstr = FDTrue
@@ -201,7 +203,7 @@ data FDConstr = FDTrue
               | FDSum     [FDExpr]          FDRel FDExpr
               | FDScalar  [FDExpr] [FDExpr] FDRel FDExpr
               | FDCount   FDExpr   [FDExpr] FDRel FDExpr
-
+  deriving (Show)
 --------------------------------------------------------------------------------
 
 --- Get the name of a FDVar.

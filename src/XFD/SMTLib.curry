@@ -13,9 +13,9 @@ import XFD.SMTLib.FromFD
 import XFD.FD
 import XFD.Solver
 
-import IO
+import System.IO
 import IOExts
-import List (last, init)
+import Data.List (last, init)
 
 -- reads lines from an input handle until a line that equals `s` is read:
 hGetContentsUntil :: Handle -> String -> IO String

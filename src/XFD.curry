@@ -12,7 +12,7 @@ module XFD (
   module XFD.Solver
   ) where
 
-import Unsafe
+import System.IO.Unsafe
 import XFD.FD
 import XFD.SMTLib
 import XFD.Solver hiding (solveFDwith, solveFDAllwith, solveFDOnewith)

@@ -1,9 +1,8 @@
 module Dimacs.FromFD where
 
-import Integer as I
+import Control.Monad.Trans.State
 
 import XFD.FD
-import XFD.State
 import Dimacs.Types
 import Dimacs.Build
 
@@ -15,7 +14,7 @@ numBits :: Int -> Int
 numBits = (2+) . ilog2
 
 numBitsFor :: Int -> Int -> Int
-numBitsFor l u = numBits $ max ((I.abs l)-1) (I.abs u)
+numBitsFor l u = numBits $ max ((Prelude.abs l)-1) (Prelude.abs u)
 
 dTrue, dFalse :: Boolean
 dTrue = va 1
@@ -25,11 +24,11 @@ type DimacsState = (Int, [(String, [Boolean])])
 type ConvertState a = State DimacsState a
 
 convertFDVars :: [FDExpr] -> ConvertState ()
-convertFDVars fdvs = (mapS_ convertFDVar $ reverse fdvs)
+convertFDVars fdvs = (mapM_ convertFDVar $ reverse fdvs)
 
 convertFDVar :: FDExpr -> ConvertState ()
 convertFDVar var = case var of
-  (FDVar n l u _) -> modifyS addVar
+  (FDVar n l u _) -> modify addVar
     where
       addVar :: DimacsState -> DimacsState
       addVar (i, vs) = (i+neededBits, (n, map va [(i+1)..(i+neededBits)]):vs)
@@ -40,21 +39,26 @@ convertFDVar var = case var of
 type SimplificationState a = State [Boolean] a
 
 convertSimplifications :: [Simplification] -> Int -> ConvertState Boolean
-convertSimplifications simps i s@(_, lVars) =
-  let bsimps = evalState (mapS (convertSimplification lVars) simps) (map va [i ..])
-  in (foldr (./\) dTrue bsimps, s)
+convertSimplifications simps i  = do
+  s@(_, lVars) <- get
+  let bsimps = evalState (mapM (convertSimplification lVars) simps) (map va [i ..])
+  return $ foldr (./\) dTrue bsimps
 
 convertSimplification :: [(String, [Boolean])] -> Simplification -> SimplificationState Boolean
-convertSimplification lVars simp bools = (arithmetic simp lVars) bools
+convertSimplification lVars simp = do
+  bools <- get
+  let (v, bools') = arithmetic simp lVars bools
+  put bools'
+  return v
 
 convertFDConstr :: FDConstr -> ConvertState Boolean
 convertFDConstr constr = case constr of
-    FDTrue               -> returnS $ dTrue
-    FDFalse              -> returnS $ dFalse
+    FDTrue               -> return $ dTrue
+    FDFalse              -> return $ dFalse
     FDRelCon   rel e1 e2 -> (convertFDRel rel) e1 e2
-    FDAnd       c1 c2    -> liftS2 (./\) (convertFDConstr c1) (convertFDConstr c2)
-    FDOr        c1 c2    -> liftS2 (.\/) (convertFDConstr c1) (convertFDConstr c2)
-    FDNot           c    -> liftS no $ convertFDConstr c
+    FDAnd       c1 c2    -> liftM2 (./\) (convertFDConstr c1) (convertFDConstr c2)
+    FDOr        c1 c2    -> liftM2 (.\/) (convertFDConstr c1) (convertFDConstr c2)
+    FDNot           c    -> liftM no $ convertFDConstr c
     _                    -> error $ "can't convert " ++ show constr
     -- FDAllDiff      xs    -> error "all diff vars"
     -- FDSum       vs rel c -> error "sum"
@@ -68,17 +72,17 @@ convertFDRel rel = case rel of
 
 convertEqual :: FDExpr -> FDExpr -> ConvertState Boolean
 convertEqual e1 e2 = case (e1, e2) of
-  (FDInt i, FDInt j) -> if i == j then returnS (dTrue) else returnS (dFalse) -- i /= j is not possible
+  (FDInt i, FDInt j) -> if i == j then return (dTrue) else return (dFalse) -- i /= j is not possible
   _                  -> booleanEqual e1 e2
 
 booleanEqual :: FDExpr -> FDExpr -> ConvertState Boolean
 booleanEqual e1 e2 = case (e1, e2) of
-  (FDInt i, FDVar n _ _ _)       -> getS `bindS` \(_, vars) ->
-                                    returnS $ setEq (toBits i)
+  (FDInt i, FDVar n _ _ _)       -> get >>= \(_, vars) ->
+                                    return $ setEq (toBits i)
                                                     (lookupVar n vars)
   (FDVar _ _ _ _, FDInt _)       -> booleanEqual e2 e1
-  (FDVar n _ _ _, FDVar m _ _ _) -> getS `bindS` \(_, vars) ->
-                                    returnS $ setEq (lookupVar m vars)
+  (FDVar n _ _ _, FDVar m _ _ _) -> get >>= \(_, vars) ->
+                                    return $ setEq (lookupVar m vars)
                                                     (lookupVar n vars)
   _                              -> error "should not happen"
 
@@ -187,7 +191,7 @@ adder vz vx vy lVars vars = case (vz,vx,vy) of
       where
         lx = length x
         ly = length y
-        ld = I.abs (lx - ly)
+        ld = Prelude.abs (lx - ly)
         padd' []  = []
         padd' [v] = replicate ld v
         padd' (v:vs@(_:_)) = v : padd' vs
@@ -276,4 +280,3 @@ binVal bits@(_:_) = binVal' bits 1
       (Var _, True)     -> (-val)
       (Not (Var _), _)  -> binVal' vs (val*2)
       _ -> error "XFD.Dimacs.binVal, in where: binVal' only takes Vars"
-

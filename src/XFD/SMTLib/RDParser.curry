@@ -4,6 +4,8 @@
 
 module XFD.SMTLib.RDParser where
 
+import Prelude hiding ((<$>))
+
 import XFD.Parser
 import XFD.SMTLib.Scanner
 import XFD.SMTLib.Types

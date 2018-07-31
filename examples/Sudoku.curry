@@ -4,7 +4,7 @@ module Sudoku where
 
 import XFD.Solvers.SMT.Z3
 -- import CLP.FD
-import List (transpose)
+import Data.List (transpose)
 
 -- Solving a Su Doku puzzle represented as a matrix of numbers (possibly free
 -- variables):

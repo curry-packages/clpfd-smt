@@ -2,6 +2,8 @@
 
 module XFD.Parser where
 
+import Prelude hiding ((<$>))
+
 type Parser token a = [token] -> Either ParseError ([token], a)
 type ParseError = String
 
@@ -45,7 +47,7 @@ yield :: a -> Parser token a
 yield x ts = Right (ts, x)
 
 --- A parser recognizing a particular terminal symbol.
-terminal :: token -> Parser token ()
+terminal :: (Eq token, Show token) => token -> Parser token ()
 terminal _ [] = eof []
 terminal x (t:ts) = case x == t of
   True  -> Right (ts, ())
@@ -56,7 +58,7 @@ eof :: Parser token a
 eof _ = Left "unexpected end-of-file"
 
 --- Returns parse error about unexpected token `t`
-unexpected :: token -> Parser token a
+unexpected :: Show token => token -> Parser token a
 unexpected t _ = Left $ "unexpected token " ++ show t
 
 --- A star combinator for parsers. The returned parser

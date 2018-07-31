@@ -5,9 +5,9 @@ module XFD.SMTLib.Scanner (
     scan, Token(..)
   ) where
 
-import ReadNumeric
-import Char
-import List (split)
+import Numeric
+import Data.Char
+import Data.List (split)
 
 data Token
     -- identifier, literals
@@ -28,7 +28,7 @@ data Token
   | KW_error
    -- other
   | EOF
-
+  deriving (Eq, Show)
 
 keywords :: [(String, Token)]
 keywords =
@@ -74,10 +74,9 @@ scanSpecialOrIdent xs =
 
 scanNum :: String -> [Token]
 scanNum xs =
-  let v = readInt xs
-  in case v of
-    Just (num, rest)  -> Number num : scan rest
-    Nothing           -> error "SMTLib.Scanner, scanNum: should not be possible"
+  case readInt xs of
+    [(num, rest)]  -> Number num : scan rest
+    _              -> error "SMTLib.Scanner, scanNum: should not be possible"
 
 scanString :: String -> [Token]
 scanString xs =

@@ -4,7 +4,8 @@ module XFD.Dimacs (
   module XFD.Solver
   ) where
 
-import IO
+import Control.Monad.Trans.State
+import System.IO
 import IOExts
 
 import Dimacs.Types
@@ -14,7 +15,6 @@ import Dimacs.Parser
 
 import Dimacs.FromFD
 import XFD.FD
-import XFD.State
 import XFD.Solver
 
 
@@ -22,10 +22,10 @@ solveDimacs :: SolverImpl--SolverConfig -> SolverOptions -> [FDExpr] -> FDConstr
 solveDimacs cfg options vars constr = do
   let (simples, simpleNum, simpleConstr) = simplifyConstr constr
       fdVars = filterFDVars (allFDVars constr ++ allFDVars simpleConstr)--listFDVars' (vars ++ allFDVars simpleConstr)
-      (boolean, (nVars, lVars)) = convert $ convertFDVars fdVars `bindS_`
-                                            convertSimplifications simples simpleNum `bindS` \b ->
-                                            convertFDConstr simpleConstr `bindS` \c ->
-                                            returnS (b ./\ c)
+      (boolean, (nVars, lVars)) = convert $ convertFDVars fdVars >>
+                                            convertSimplifications simples simpleNum >>= \b ->
+                                            convertFDConstr simpleConstr >>= \c ->
+                                            return (b ./\ c)
       baseDimacs = prettyDimacs nVars boolean
       exec = unwords $ (executable cfg):(flags cfg)
       names = map (\(FDVar n _ _ _) -> n) vars
@@ -128,9 +128,9 @@ test :: [FDExpr] -> FDConstr -> IO ()
 test vs c =
   let (simps, i, nc) = simplifyConstr c
       (b, (n, _)) = convert $ (convertFDVars $ filterFDVars (vs ++ allFDVars nc))
-                        `bindS_` (convertSimplifications simps i)
-                        `bindS` \s -> convertFDConstr nc
-                        `bindS` \t -> returnS (s ./\ t)
+                        >> (convertSimplifications simps i)
+                        >>= \s -> convertFDConstr nc
+                        >>= \t -> return (s ./\ t)
   in putStrLn $ prettyDimacs (i+n) b
 
 -- test :: [FDExpr] -> FDConstr -> IO ()
